@@ -24,8 +24,8 @@ jobs:
 
       - name: Generate SBOM
         run: |
-          REPO_URL="https://github.com/${{ github.event.repository.url }}"
-          trivy repo --format cyclonedx --scanners vuln --output trivy.json "$REPO_URL"
+          REPO_URL="${{ github.event.repository.url }}"
+          trivy repo --format cyclonedx --scanners vuln --output trivy.json ${{ github.event.repository.url }}
 
       - name: Upload SBOM to DTrack
         run: |
