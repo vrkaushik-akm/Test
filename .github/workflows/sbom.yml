@@ -1,0 +1,35 @@
+name: Generate and Upload SBOM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.38.3
+
+      - name: Generate SBOM
+        run: |
+          REPO_URL="https://github.com/${{ env.GITHUB_REPOSITORY }}"
+          trivy repo --format cyclonedx --scanners vuln --output trivy.json "$REPO_URL"
+
+      - name: Upload SBOM to DTrack
+        run: |
+          curl -X POST https://dtrack.linode.com/api/api/v1/bom -H "accept: application/json" -H "X-API-Key: ${{ secrets.DTRACK_API_KEY }}" -H "Content-Type: multipart/form-data" -F "autoCreate=true" -F "projectName=${{ env.GITHUB_REPOSITORY }}" -F bom=@trivy.json 
+
+      - name: Cleanup
+        run: rm trivy.json
