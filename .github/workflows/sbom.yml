@@ -29,7 +29,7 @@ jobs:
 
       - name: Upload SBOM to DTrack
         run: |
-          curl -X POST https://testdtrack.vrkaushik.com/api/api/v1/bom -H "accept: application/json" -H "X-API-Key: ${{ secrets.DTRACK_API_KEY }}" -H "Content-Type: multipart/form-data" -F "autoCreate=true" -F "projectName=${{ github.event.repository }}" -F "bom=@trivy.json" 
+          curl -X POST https://testdtrack.vrkaushik.com/api/api/v1/bom -H "accept: application/json" -H "X-API-Key: ${{ secrets.DTRACK_API_KEY }}" -H "Content-Type: multipart/form-data" -F "autoCreate=true" -F "projectName=${{ github.repository }}" -F "bom=@trivy.json" 
 
       - name: Cleanup
         run: rm trivy.json
